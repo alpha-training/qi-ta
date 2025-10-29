@@ -1,0 +1,2 @@
+# qi-ta
+Technical analysis
