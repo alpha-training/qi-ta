@@ -2,7 +2,7 @@
 
 / private
 
-.qi.includecfg"ta/settings.csv"
+.qi.include"ta/settings.csv"
 
 \d .ta
 
@@ -327,7 +327,7 @@ MEDPRICE:{[x]
 TYPPRICE:{[x]
   update typprice:(high+low+close)%3 by sym from x
   }
-  
+
 / Weighted average
 WCLPRICE:{[x]
   update wclprice:(high+low+2*close)%4 by sym from x
