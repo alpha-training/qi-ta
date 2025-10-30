@@ -40,12 +40,12 @@ RSI:{[px;n]
   }
 
 / Bollinger Bands
-BBANDS:{BBANDSx[`high`low`close;CFG`BB.N;x]}
+BBANDS:{BBANDSx[`high`low`close;CFG`BB_N;x]}
 
 BBANDSx:{[pxCols;n;x]
   byc:u.bycols x;
   a:$[1=count pxCols;[c:pxCols 0;x];[c:`TP;![x;();byc;enlist[`TP]!enlist(avg;(enlist),pxCols)]]];
-  a:![a;();byc;`sma`k_dev!((mavg;n;c);(*;CFG`BB.K;(mdev;n;c)))];
+  a:![a;();byc;`sma`k_dev!((mavg;n;c);(*;CFG`BB_K;(mdev;n;c)))];
   a:update upperBB:sma+k_dev,lowerBB:sma-k_dev from a;
   $[INTER;a;`sma`k_dev _a]
  }
