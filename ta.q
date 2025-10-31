@@ -2,30 +2,9 @@
 
 / private
 
-.qi.include"ta/settings.csv"
-
 \d .ta
 
-cfg.add:{@[`.;`CFG;,;x]}
-CFG:{`..CFG x}
-
-u.SETTINGS:.qi.qiconfig`ta`settings.csv;
 u.bycols:{a!a:`date`sym`tenor inter cols x}
-
-/ global settings
-cfg.load:{
-  a:("SC*";enlist",")0:u.SETTINGS;
-  cfg.add(1#.q),exec name!upper[typ]$default from a;
-  @[`.;`CFG_TYPES;:;exec name!upper typ from a];
- }
-
-/ Override .qs.CFG with specific settings
-cfg.loadJSON:{[p]
-  a:.j.k trim raze read0 .qi.path p;
-  if[count new:key[a]except key`. `CFG;'"unrecognized: ",sv[",";string new]," must be present in ",.qi.spath u.SETTINGS];
-  typ:@[key[a]#`. `CFG_TYPES;where 10<>abs type each a;lower];
-  cfg.add typ$a;
- }
 
 / Relative strength index - RSI - ranges from 0-100
 u.relativeStrength:{[px;n]
@@ -40,12 +19,12 @@ RSI:{[px;n]
   }
 
 / Bollinger Bands
-BBANDS:{BBANDSx[`high`low`close;CFG`BB_N;x]}
+BBANDS:{BBANDSx[`high`low`close;cfg.BB_N;x]}
 
 BBANDSx:{[pxCols;n;x]
   byc:u.bycols x;
   a:$[1=count pxCols;[c:pxCols 0;x];[c:`TP;![x;();byc;enlist[`TP]!enlist(avg;(enlist),pxCols)]]];
-  a:![a;();byc;`sma`k_dev!((mavg;n;c);(*;CFG`BB_K;(mdev;n;c)))];
+  a:![a;();byc;`sma`k_dev!((mavg;n;c);(*;cfg.BB_K;(mdev;n;c)))];
   a:update upperBB:sma+k_dev,lowerBB:sma-k_dev from a;
   $[INTER;a;`sma`k_dev _a]
  }
@@ -70,9 +49,9 @@ STOCH:{[x;n;m]
     }
 
 // Moving Average Convergence Divergence - MACD - Peter
-MACD:{MACDx[`close;x;CFG`MACD.FAST;CFG`MACD.SLOW;CFG`MACD.PERIOD]}
+MACD:{MACDx[`close;x;cfg.MACD.FAST;cfg.MACD.SLOW;cfg.MACD.PERIOD]}
 
-MACDFIX:{MACDx[`close;x;12;26;CFG`MACD.PERIOD]}
+MACDFIX:{MACDx[`close;x;12;26;cfg.MACD.PERIOD]}
 
 MACDx:{[pxCol;x;fast;slow;sigPeriod]
     a:update emaFast:ema[2%fast+1;x[pxCol]] by sym from x;
@@ -371,8 +350,7 @@ CCI:{[x;n]
 WILLR:{[x;n]
   update willR:(((n-1)#0n),(n-1) _-100*{(y-x)%y-z}[close;n mmax high;n mmin low]) by sym from x
   }
-
-cfg.load`;
-INTER:CFG`SHOW_INTERMEDIARY
+  
+INTER:cfg.SHOW_INTERMEDIARY
 
 \d .
