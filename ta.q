@@ -98,7 +98,7 @@ KAMA:{[x;n;fast;slow]
     slowSC:2%slow+1;
     sc:((er*(fastSC-slowSC))+slowSC) xexp 2;
     / Pad first n SCs with 0 to align
-    sc:(n#0),(n)_sc;
+    sc:(n#0),n _sc;
     / Compute KAMA recursively
     kama:{x+z*(y-x)}\[first prices;prices]sc;
     kama
@@ -133,8 +133,8 @@ MFI:{[x;n]
   rmf:tp*a`volume;
   posMF:rmf*tp>prev tp;negMF:rmf*tp<prev tp;
   rollsum:{sum x[z+til y]};
-  sumPos:(n#0n),rollsum[posMF;n;] each 1+til count (n)_posMF;
-  sumNeg:(n#0n),rollsum[negMF;n;] each 1+til count (n)_negMF;
+  sumPos:(n#0n),rollsum[posMF;n;] each 1+til count n _posMF;
+  sumNeg:(n#0n),rollsum[negMF;n;] each 1+til count n _negMF;
   mfRatio:sumPos%sumNeg;
   mfi:100-(100%(1+mfRatio))};
   update mfi:calcMFI[x;n] by sym from x
@@ -254,11 +254,11 @@ ADXR:{[x;n]
 
 wilderSmooth:{[x;n]
   init:sum x[til n];
-  smoothed:((n-1)#0n),init,{(x-(x%z))+y}\[init;(n)_x;n]}
+  smoothed:((n-1)#0n),init,{(x-(x%z))+y}\[init;n _x;n]}
 
 wilderAvgSmooth:{[x;n]
   init:avg x[til n];
-  smoothed:((n-1)#0n),init,{((x*(z-1))+y)%z}\[init;(n)_x;n]}
+  smoothed:((n-1)#0n),init,{((x*(z-1))+y)%z}\[init;n _x;n]}
 
 // MOM (Momentum) - Peter
 MOM:{[x;n]
@@ -271,26 +271,26 @@ MOM:{[x;n]
 ROC:{[x;n]
   calcROC:{[px;n] 
     mom:(n#0n),neg n _((n rotate px)-px);
-    rocp:(n#0n),((n)_mom%px);
+    rocp:(n#0n),(n _mom%px);
     100*rocp};
   update roc:calcROC[close;n] by sym from x}
 
 ROCP:{[x;n]
   calcROCP:{[px;n] 
     mom:(n#0n),neg n _((n rotate px)-px);
-    (n#0n),((n)_mom%px)};
+    (n#0n),(n _mom%px)};
   update rocp:calcROCP[close;n] by sym from x}
 
 ROCR:{[x;n]
   calcROCR:{[px;n] 
     mom:(n#0n),neg n _((n rotate px)-px);
-    rocr:(n#0n),(((n)_mom%px)+1)};
+    rocr:(n#0n),((n _mom%px)+1)};
   update rocr:calcROCR[close;n] by sym from x}
 
 ROCR100:{[x;n]
   calcROCR100:{[px;n] 
     mom:(n#0n),neg n _((n rotate px)-px);
-    rocr:(n#0n),(((n)_mom%px)+1);  
+    rocr:(n#0n),((n _mom%px)+1);  
     rocr*100};
   update rocr100:calcROCR100[close;n] by sym from x}
 
