@@ -98,7 +98,7 @@ KAMA:{[x;n;fast;slow]
     slowSC:2%slow+1;
     sc:((er*(fastSC-slowSC))+slowSC) xexp 2;
     / Pad first n SCs with 0 to align
-    sc:(n#0),(n)_sc;
+    sc:(n#0),n _sc;
     / Compute KAMA recursively
     kama:{x+z*(y-x)}\[first prices;prices]sc;
     kama
@@ -133,8 +133,8 @@ MFI:{[x;n]
   rmf:tp*a`volume;
   posMF:rmf*tp>prev tp;negMF:rmf*tp<prev tp;
   rollsum:{sum x[z+til y]};
-  sumPos:(n#0n),rollsum[posMF;n;] each 1+til count (n)_posMF;
-  sumNeg:(n#0n),rollsum[negMF;n;] each 1+til count (n)_negMF;
+  sumPos:(n#0n),rollsum[posMF;n;] each 1+til count n _posMF;
+  sumNeg:(n#0n),rollsum[negMF;n;] each 1+til count n _negMF;
   mfRatio:sumPos%sumNeg;
   mfi:100-(100%(1+mfRatio))};
   update mfi:calcMFI[x;n] by sym from x
@@ -142,11 +142,11 @@ MFI:{[x;n]
 
 // AROON and AROONOSC (Aroon and Aroon Oscillator) - Peter
 AROON:{[x;n]
-    update aroonUp:.ta.AROONx[x`high;n;max],aroonDn:.ta.AROONx[x`low;n;min] by sym from x
+    update aroonUp:AROONx[x`high;n;max],aroonDn:AROONx[x`low;n;min] by sym from x
     }
 
 AROONOSC:{[x;n]
-    update aroonOsc:.ta.AROONx[x`high;n;max] - .ta.AROONx[x`low;n;min] by sym from x
+    update aroonOsc:AROONx[x`high;n;max] - AROONx[x`low;n;min] by sym from x
     }
 
 AROONx:{[c;n;f] 
@@ -184,14 +184,14 @@ TRANGE:{[x]
 
 / ATR (Average True Range)
 ATR:{[x;n]
-  calcATR:{[x;n] tr:.ta.TRANGE[x]`trueRange;start:avg tr[1+til n];
+  calcATR:{[x;n] tr:TRANGE[x]`trueRange;start:avg tr[1+til n];
   atr:(n#0n),start,{(y+x*(z-1))%z}\[start;(n+1)_tr;n]};
   update atr:calcATR[x;n] by sym from x
   }
 
 / NATR (Normalized Average True Range)
 NATR:{[x;n]
-  calcNATR:{[x;n] tr:.ta.TRANGE[x]`trueRange;start:avg tr[1+til n];
+  calcNATR:{[x;n] tr:TRANGE[x]`trueRange;start:avg tr[1+til n];
   atr:(n#0n),start,{(y+x*(z-1))%z}\[start;(n+1)_tr;n];
   natr:100*atr%x`close};
   update natr:calcNATR[x;n] by sym from x
@@ -219,46 +219,46 @@ MINUS_DM:{[x;n]
   update minusDM:getMinusDM[x;n] by sym from x}
 
 PLUS_DI:{[x;n]
-  getPlusDI:{[x;n] plusDM:.ta.PLUS_DM[x;n]`plusDM;
-  tRange:.ta.TRANGE[x]`trueRange;
-  smoothTR:.ta.wilderSmooth[tRange;n];
+  getPlusDI:{[x;n] plusDM:PLUS_DM[x;n]`plusDM;
+  tRange:TRANGE[x]`trueRange;
+  smoothTR:wilderSmooth[tRange;n];
   smthPlusDM:100*plusDM%smoothTR;
   @[smthPlusDM;n-1;:;0n]};
   update plusDI:getPlusDI[x;n] by sym from x}
 
 MINUS_DI:{[x;n]
-  getMinusDI:{[x;n] minusDM:.ta.MINUS_DM[x;n]`minusDM;
-  tRange:.ta.TRANGE[x]`trueRange;
-  smoothTR:.ta.wilderSmooth[tRange;n];
+  getMinusDI:{[x;n] minusDM:MINUS_DM[x;n]`minusDM;
+  tRange:TRANGE[x]`trueRange;
+  smoothTR:wilderSmooth[tRange;n];
   smthMinusDM:100*minusDM%smoothTR;
   @[smthMinusDM;n-1;:;0n]};
   update minusDI:getMinusDI[x;n] by sym from x}
 
 DX:{[x;n]
-  getDX:{[x;n] plusDI:.ta.PLUS_DI[x;n]`plusDI;
-  minusDI:.ta.MINUS_DI[x;n]`minusDI;
+  getDX:{[x;n] plusDI:PLUS_DI[x;n]`plusDI;
+  minusDI:MINUS_DI[x;n]`minusDI;
   dx:100*abs(plusDI-minusDI)%(plusDI+minusDI);
   @[dx;n-1;:;0n]};
   update dx:getDX[x;n] by sym from x}
 
 ADX:{[x;n]
-  getADX:{[x;n] dx:.ta.DX[x;n]`dx;
-  adx:(n#0n),.ta.wilderAvgSmooth[n _dx;n]};
+  getADX:{[x;n] dx:DX[x;n]`dx;
+  adx:(n#0n),wilderAvgSmooth[n _dx;n]};
   update adx:getADX[x;n] by sym from x}
 
 ADXR:{[x;n]
-  getADXR:{[x;n] adx:.ta.ADX[x;n]`adx;
+  getADXR:{[x;n] adx:ADX[x;n]`adx;
   shifted:neg[n-1]_#[n-1;0n],adx;
   adxr:(shifted+adx)%2};
   update adxr:getADXR[x;n] by sym from x}
 
 wilderSmooth:{[x;n]
   init:sum x[til n];
-  smoothed:((n-1)#0n),init,{(x-(x%z))+y}\[init;(n)_x;n]}
+  smoothed:((n-1)#0n),init,{(x-(x%z))+y}\[init;n _x;n]}
 
 wilderAvgSmooth:{[x;n]
   init:avg x[til n];
-  smoothed:((n-1)#0n),init,{((x*(z-1))+y)%z}\[init;(n)_x;n]}
+  smoothed:((n-1)#0n),init,{((x*(z-1))+y)%z}\[init;n _x;n]}
 
 // MOM (Momentum) - Peter
 MOM:{[x;n]
@@ -271,26 +271,26 @@ MOM:{[x;n]
 ROC:{[x;n]
   calcROC:{[px;n] 
     mom:(n#0n),neg n _((n rotate px)-px);
-    rocp:(n#0n),((n)_mom%px);
+    rocp:(n#0n),(n _mom%px);
     100*rocp};
   update roc:calcROC[close;n] by sym from x}
 
 ROCP:{[x;n]
   calcROCP:{[px;n] 
     mom:(n#0n),neg n _((n rotate px)-px);
-    (n#0n),((n)_mom%px)};
+    (n#0n),(n _mom%px)};
   update rocp:calcROCP[close;n] by sym from x}
 
 ROCR:{[x;n]
   calcROCR:{[px;n] 
     mom:(n#0n),neg n _((n rotate px)-px);
-    rocr:(n#0n),(((n)_mom%px)+1)};
+    rocr:(n#0n),((n _mom%px)+1)};
   update rocr:calcROCR[close;n] by sym from x}
 
 ROCR100:{[x;n]
   calcROCR100:{[px;n] 
     mom:(n#0n),neg n _((n rotate px)-px);
-    rocr:(n#0n),(((n)_mom%px)+1);  
+    rocr:(n#0n),((n _mom%px)+1);  
     rocr*100};
   update rocr100:calcROCR100[close;n] by sym from x}
 
