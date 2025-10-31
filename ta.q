@@ -1,5 +1,4 @@
 / Technical analysis helper library
-
 / private
 
 \d .ta
@@ -350,7 +349,7 @@ CCI:{[x;n]
 WILLR:{[x;n]
   update willR:(((n-1)#0n),(n-1) _-100*{(y-x)%y-z}[close;n mmax high;n mmin low]) by sym from x
   }
-  
+
 INTER:cfg.SHOW_INTERMEDIARY
 
 \d .
